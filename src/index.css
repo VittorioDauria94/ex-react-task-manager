@@ -4,3 +4,14 @@
     text-decoration: none;
     color: inherit;
 }
+
+/* Footer */
+.booltasks-footer {
+  height: 100px;
+  background: white;
+  color: rgb(102, 102, 102);
+  padding: 1rem 0;
+  font-size: 0.85rem;
+  justify-content: center;
+  align-items: center;
+}

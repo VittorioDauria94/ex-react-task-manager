@@ -6,7 +6,7 @@ export default function Header() {
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid px-4">
         <NavLink className="navbar-brand" to="/">
-          BoolTask
+          BoolTasks
         </NavLink>
         <button className="navbar-toggler" type="button">
           <span className="navbar-toggler-icon"></span>

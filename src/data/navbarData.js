@@ -7,7 +7,7 @@ const navbarData = [
   {
     id: 2,
     title: "Aggiungi Task",
-    path: "/newTasks",
+    path: "/newtasks",
   },
 ];
 

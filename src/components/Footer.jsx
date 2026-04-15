@@ -1,3 +1,7 @@
 export default function Header() {
-  return <footer>Footer</footer>;
+  return (
+    <footer className="booltasks-footer d-flex">
+      <p>© BoolTasks</p>
+    </footer>
+  );
 }
