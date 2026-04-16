@@ -2,6 +2,9 @@ import { NavLink } from "react-router-dom";
 import navbarData from "../data/navbarData";
 
 export default function Header() {
+  function handleSubmit(e) {
+    e.preventDefault();
+  }
   return (
     <nav className="navbar navbar-expand-lg bg-white border-bottom shadow-sm sticky-top">
       <div className="container py-2">
@@ -45,7 +48,7 @@ export default function Header() {
             ))}
           </ul>
 
-          <form className="d-flex gap-2" role="search">
+          <form className="d-flex gap-2" role="search" onSubmit={handleSubmit}>
             <input
               className="form-control rounded-pill"
               type="search"

@@ -1,10 +1,13 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
+import Modal from "../components/Modal";
+import { useState } from "react";
 
 export default function TaskDetails() {
   const { id } = useParams();
   const { tasks, removeTask } = useGlobal();
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
   const task = tasks.find((task) => task.id === Number(id));
 
@@ -18,6 +21,7 @@ export default function TaskDetails() {
   async function handleRemove(taskId) {
     try {
       await removeTask(taskId);
+      setShowModal(false);
       alert("Task eliminata correttamente");
       navigate("/");
     } catch (error) {
@@ -78,10 +82,19 @@ export default function TaskDetails() {
 
                 <button
                   className="btn btn-danger rounded-pill px-4"
-                  onClick={() => handleRemove(task.id)}
+                  onClick={() => setShowModal(true)}
                 >
                   Elimina Task
                 </button>
+
+                <Modal
+                  title="Elimina Task"
+                  content="Sei sicuro di voler eliminare questa task?"
+                  show={showModal}
+                  onClose={() => setShowModal(false)}
+                  onConfirm={() => handleRemove(task.id)}
+                  confirmText="Conferma"
+                />
               </div>
             </div>
           </div>
