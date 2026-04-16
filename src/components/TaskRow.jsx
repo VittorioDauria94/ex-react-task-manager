@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Link } from "react-router-dom";
 
 export default memo(function TaskRow({ task }) {
   function getStatusClass(status) {
@@ -10,7 +11,14 @@ export default memo(function TaskRow({ task }) {
 
   return (
     <tr>
-      <td className="fw-medium">{task.title}</td>
+      <td className="fw-medium">
+        <Link
+          to={`/task/${task.id}`}
+          className="text-decoration-none link-body-emphasis"
+        >
+          {task.title}
+        </Link>
+      </td>
       <td className={`${getStatusClass(task.status)} fw-semibold`}>
         {task.status}
       </td>
