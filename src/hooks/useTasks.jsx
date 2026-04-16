@@ -40,14 +40,34 @@ export default function useTasks() {
       }
 
       setTasks((prev) => [...prev, data.task]);
-      
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
       throw error;
     }
   }
 
-  function removeTask() {}
+  // DELETE
+  async function removeTask(id) {
+    try {
+      const resp = await fetch(
+        `${import.meta.env.VITE_BACKEND_TASKLIST_URL}/${id}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      const data = await resp.json();
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      setTasks((prev) => prev.filter((task) => task.id !== Number(id)));
+    } catch (error) {
+      console.error(error.message);
+      throw error;
+    }
+  }
 
   function updateTask() {}
 

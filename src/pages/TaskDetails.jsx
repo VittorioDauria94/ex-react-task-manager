@@ -1,9 +1,10 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 
 export default function TaskDetails() {
   const { id } = useParams();
-  const { tasks } = useGlobal();
+  const { tasks, removeTask } = useGlobal();
+  const navigate = useNavigate();
 
   const task = tasks.find((task) => task.id === Number(id));
 
@@ -12,6 +13,16 @@ export default function TaskDetails() {
     if (status === "Doing") return "text-bg-warning";
     if (status === "Done") return "text-bg-success";
     return "text-bg-secondary";
+  }
+
+  async function handleRemove(taskId) {
+    try {
+      await removeTask(taskId);
+      alert("Task eliminata correttamente");
+      navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
   }
 
   if (!task) {
@@ -67,7 +78,7 @@ export default function TaskDetails() {
 
                 <button
                   className="btn btn-danger rounded-pill px-4"
-                  onClick={() => console.log("Elimino Task")}
+                  onClick={() => handleRemove(task.id)}
                 >
                   Elimina Task
                 </button>
