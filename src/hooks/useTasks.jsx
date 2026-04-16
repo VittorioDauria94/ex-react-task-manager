@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 export default function useTasks() {
   const [tasks, setTasks] = useState([]);
 
+  // GET
   async function getTasks() {
     try {
       const resp = await fetch(import.meta.env.VITE_BACKEND_TASKLIST_URL);
@@ -21,7 +22,30 @@ export default function useTasks() {
     getTasks().then((data) => setTasks(data));
   }, []);
 
-  function addTask() {}
+  // POST
+  async function addTask(taskData) {
+    try {
+      const resp = await fetch(import.meta.env.VITE_BACKEND_TASKLIST_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
+      });
+
+      const data = await resp.json();
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      setTasks((prev) => [...prev, data.task]);
+      
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 
   function removeTask() {}
 

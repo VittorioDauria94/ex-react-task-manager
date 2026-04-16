@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useGlobal } from "../context/GlobalContext";
 
 const symbols = "!@#$%^&*()-_=+[]{}|;:'\\\",.<>?/`~";
 
@@ -8,6 +9,7 @@ export default function AddTask() {
   const [isTitleTouched, setIsTitleTouched] = useState(false);
   const descriptionRef = useRef();
   const statusRef = useRef();
+  const { addTask } = useGlobal();
 
   const isTitleValid = useMemo(() => {
     const hasSpecialSymbols = title
@@ -17,20 +19,31 @@ export default function AddTask() {
     return title.trim().length > 0 && !hasSpecialSymbols;
   }, [title]);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!isTitleValid) {
       setError("Tutti i campi devono essere compilati correttamente.");
       return;
     }
 
-    setError("");
-
-    console.log({
+    const newTask = {
       title,
       description: descriptionRef.current.value,
       status: statusRef.current.value,
-    });
+    };
+
+    try {
+      await addTask(newTask);
+      alert("Task aggiunta correttamente");
+
+      setError("");
+      setTitle("");
+      setIsTitleTouched(false);
+      descriptionRef.current.value = "";
+      statusRef.current.value = "To do";
+    } catch (error) {
+      alert(error.message);
+    }
   }
 
   return (
