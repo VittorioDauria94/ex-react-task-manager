@@ -33,6 +33,10 @@ export default function useTasks() {
         body: JSON.stringify(taskData),
       });
 
+      if (!resp.ok) {
+        throw new Error("Errore nella risposta del server");
+      }
+
       const data = await resp.json();
 
       if (!data.success) {
@@ -56,6 +60,10 @@ export default function useTasks() {
         },
       );
 
+      if (!resp.ok) {
+        throw new Error("Errore nella risposta del server");
+      }
+
       const data = await resp.json();
 
       if (!data.success) {
@@ -69,7 +77,38 @@ export default function useTasks() {
     }
   }
 
-  function updateTask() {}
+  //PUT
+  async function updateTask(id, taskData) {
+    try {
+      const resp = await fetch(
+        `${import.meta.env.VITE_BACKEND_TASKLIST_URL}/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(taskData),
+        },
+      );
+
+      if (!resp.ok) {
+        throw new Error("Errore nella risposta del server");
+      }
+
+      const data = await resp.json();
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      setTasks((prev) =>
+        prev.map((task) => (task.id === Number(id) ? data.task : task)),
+      );
+    } catch (error) {
+      console.error(error.message);
+      throw error;
+    }
+  }
 
   console.log(tasks);
 

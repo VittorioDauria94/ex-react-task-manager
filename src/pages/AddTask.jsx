@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useGlobal } from "../context/GlobalContext";
-
-const symbols = "!@#$%^&*()-_=+[]{}|;:'\\\",.<>?/`~";
+import { validateTaskTitle } from "../function/titleValidation";
 
 export default function AddTask() {
   const [title, setTitle] = useState("");
@@ -11,13 +10,7 @@ export default function AddTask() {
   const statusRef = useRef();
   const { addTask } = useGlobal();
 
-  const isTitleValid = useMemo(() => {
-    const hasSpecialSymbols = title
-      .split("")
-      .some((char) => symbols.includes(char));
-
-    return title.trim().length > 0 && !hasSpecialSymbols;
-  }, [title]);
+  const isTitleValid = useMemo(() => validateTaskTitle(title), [title]);
 
   async function handleSubmit(e) {
     e.preventDefault();

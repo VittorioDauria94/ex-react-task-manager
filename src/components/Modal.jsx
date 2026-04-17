@@ -7,6 +7,7 @@ export default function Modal({
   onClose,
   onConfirm,
   confirmText = "Conferma",
+  btnColor = "btn-primary",
 }) {
   if (!show) return null;
 
@@ -31,7 +32,7 @@ export default function Modal({
             </div>
 
             <div className="modal-body">
-              <p className="mb-0 text-muted">{content}</p>
+              <div className="mb-0 text-muted">{content}</div>
             </div>
 
             <div className="modal-footer border-0 pt-0 px-4 pb-4">
@@ -45,7 +46,7 @@ export default function Modal({
 
               <button
                 type="button"
-                className="btn btn-danger rounded-pill px-4"
+                className={`btn ${btnColor} rounded-pill px-4`}
                 onClick={onConfirm}
               >
                 {confirmText}

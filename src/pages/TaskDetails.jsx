@@ -2,12 +2,14 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGlobal } from "../context/GlobalContext";
 import Modal from "../components/Modal";
 import { useState } from "react";
+import EditTaskModal from "../components/EditTaskModal";
 
 export default function TaskDetails() {
   const { id } = useParams();
-  const { tasks, removeTask } = useGlobal();
+  const { tasks, removeTask, updateTask } = useGlobal();
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const task = tasks.find((task) => task.id === Number(id));
 
@@ -24,6 +26,16 @@ export default function TaskDetails() {
       setShowModal(false);
       alert("Task eliminata correttamente");
       navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  async function handleSave(updatedTask) {
+    try {
+      await updateTask(task.id, updatedTask);
+      alert("Task modificata correttamente");
+      setShowEditModal(false);
     } catch (error) {
       alert(error.message);
     }
@@ -81,6 +93,13 @@ export default function TaskDetails() {
                 </Link>
 
                 <button
+                  className="btn btn-primary rounded-pill px-4"
+                  onClick={() => setShowEditModal(true)}
+                >
+                  Modifica Task
+                </button>
+
+                <button
                   className="btn btn-danger rounded-pill px-4"
                   onClick={() => setShowModal(true)}
                 >
@@ -94,6 +113,14 @@ export default function TaskDetails() {
                   onClose={() => setShowModal(false)}
                   onConfirm={() => handleRemove(task.id)}
                   confirmText="Conferma"
+                  btnColor={"btn-danger"}
+                />
+
+                <EditTaskModal
+                  task={task}
+                  show={showEditModal}
+                  onClose={() => setShowEditModal(false)}
+                  onSave={handleSave}
                 />
               </div>
             </div>
