@@ -1,8 +1,42 @@
 import { useGlobal } from "../context/GlobalContext";
 import TaskRow from "../components/TaskRow";
+import { useMemo, useState } from "react";
 
 export default function TaskList() {
   const { tasks } = useGlobal();
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState(1);
+
+  const sortedTasks = useMemo(() => {
+    const tasksCopy = [...tasks];
+    const statusOrder = {
+      "To do": 0,
+      Doing: 1,
+      Done: 2,
+    };
+
+    return tasksCopy.sort((a, b) => {
+      if (sortBy === "title") {
+        return sortOrder === 1
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title);
+      }
+
+      if (sortBy === "status") {
+        return sortOrder === 1
+          ? statusOrder[a.status] - statusOrder[b.status]
+          : statusOrder[b.status] - statusOrder[a.status];
+      }
+
+      if (sortBy === "createdAt") {
+        return sortOrder === 1
+          ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+
+      return 0;
+    });
+  }, [tasks, sortBy, sortOrder]);
 
   return (
     <div className="container py-5">
@@ -21,7 +55,8 @@ export default function TaskList() {
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h2 className="h5 mb-0">Panoramica</h2>
                   <span className="badge text-bg-primary rounded-pill px-3 py-2">
-                    {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
+                    {sortedTasks.length}{" "}
+                    {sortedTasks.length === 1 ? "task" : "tasks"}
                   </span>
                 </div>
 
@@ -29,21 +64,76 @@ export default function TaskList() {
                   <table className="table table-hover align-middle mb-0">
                     <thead className="table-light">
                       <tr>
-                        <th scope="col" className="fw-semibold py-3">
-                          Nome
+                        <th scope="col" className="py-3">
+                          <button
+                            type="button"
+                            className="btn btn-link text-decoration-none text-dark p-0 border-0 shadow-none fw-semibold
+                          "
+                            onClick={() => {
+                              if (sortBy === "title") {
+                                setSortOrder((prev) => (prev === 1 ? -1 : 1));
+                              } else {
+                                setSortBy("title");
+                                setSortOrder(1);
+                              }
+                            }}
+                          >
+                            Nome
+                            {sortBy === "title"
+                              ? sortOrder === 1
+                                ? " ⮝"
+                                : " ⮟"
+                              : " ↕"}
+                          </button>
                         </th>
                         <th scope="col" className="fw-semibold py-3">
-                          Stato
+                          <button
+                            type="button"
+                            className="btn btn-link text-decoration-none text-dark p-0 border-0 shadow-none fw-semibold"
+                            onClick={() => {
+                              if (sortBy === "status") {
+                                setSortOrder((prev) => (prev === 1 ? -1 : 1));
+                              } else {
+                                setSortBy("status");
+                                setSortOrder(1);
+                              }
+                            }}
+                          >
+                            Stato
+                            {sortBy === "status"
+                              ? sortOrder === 1
+                                ? " ⮝"
+                                : " ⮟"
+                              : " ↕"}
+                          </button>
                         </th>
                         <th scope="col" className="fw-semibold py-3">
-                          Data di Creazione
+                          <button
+                            type="button"
+                            className="btn btn-link text-decoration-none text-dark p-0 border-0 shadow-none fw-semibold"
+                            onClick={() => {
+                              if (sortBy === "createdAt") {
+                                setSortOrder((prev) => (prev === 1 ? -1 : 1));
+                              } else {
+                                setSortBy("createdAt");
+                                setSortOrder(1);
+                              }
+                            }}
+                          >
+                            Data di Creazione
+                            {sortBy === "createdAt"
+                              ? sortOrder === 1
+                                ? " ⮝"
+                                : " ⮟"
+                              : " ↕"}
+                          </button>
                         </th>
                       </tr>
                     </thead>
 
                     <tbody>
-                      {tasks.length > 0 ? (
-                        tasks.map((task) => (
+                      {sortedTasks.length > 0 ? (
+                        sortedTasks.map((task) => (
                           <TaskRow key={task.id} task={task} />
                         ))
                       ) : (
