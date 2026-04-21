@@ -1,21 +1,38 @@
 import { useGlobal } from "../context/GlobalContext";
 import TaskRow from "../components/TaskRow";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { debounce } from "../functions/debounce";
 
 export default function TaskList() {
   const { tasks } = useGlobal();
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = useCallback(
+    debounce((value) => {
+      setSearchQuery(value.trim().toLowerCase());
+    }, 500),
+    [],
+  );
+
+  const handleChange = (e) => {
+    handleSearch(e.target.value);
+  };
 
   const sortedTasks = useMemo(() => {
-    const tasksCopy = [...tasks];
+    const filteredTasks = tasks.filter((t) => {
+      if (searchQuery === "") return true;
+      return t.title.toLowerCase().includes(searchQuery);
+    });
+
     const statusOrder = {
       "To do": 0,
       Doing: 1,
       Done: 2,
     };
 
-    return tasksCopy.sort((a, b) => {
+    return filteredTasks.sort((a, b) => {
       if (sortBy === "title") {
         return sortOrder === 1
           ? a.title.localeCompare(b.title)
@@ -36,7 +53,7 @@ export default function TaskList() {
 
       return 0;
     });
-  }, [tasks, sortBy, sortOrder]);
+  }, [tasks, sortBy, sortOrder, searchQuery]);
 
   return (
     <div className="container py-5">
@@ -52,6 +69,19 @@ export default function TaskList() {
               </div>
 
               <div className="p-4">
+                <form
+                  className="d-flex gap-2 mb-4"
+                  role="search"
+                  onSubmit={(e) => e.preventDefault()}
+                >
+                  <input
+                    className="form-control rounded-pill"
+                    type="search"
+                    placeholder="Cerca la task..."
+                    aria-label="Search"
+                    onChange={handleChange}
+                  />
+                </form>
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h2 className="h5 mb-0">Panoramica</h2>
                   <span className="badge text-bg-primary rounded-pill px-3 py-2">

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Modal from "./Modal";
-import { validateTaskTitle } from "../function/titleValidation";
+import { validateTaskTitle } from "../functions/titleValidation";
 
 export default function EditTaskModal({ show, onClose, task, onSave }) {
   const [title, setTitle] = useState(task.title);

@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { useGlobal } from "../context/GlobalContext";
-import { validateTaskTitle } from "../function/titleValidation";
+import { validateTaskTitle } from "../functions/titleValidation";
 
 export default function AddTask() {
   const [title, setTitle] = useState("");
