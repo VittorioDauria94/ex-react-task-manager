@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
 
-export default memo(function TaskRow({ task }) {
+export default memo(function TaskRow({ task, checked, onToggle }) {
   function getStatusClass(status) {
     if (status === "To do") return "table-danger";
     if (status === "Doing") return "table-warning";
@@ -12,12 +12,22 @@ export default memo(function TaskRow({ task }) {
   return (
     <tr>
       <td className="fw-medium">
-        <Link
-          to={`/task/${task.id}`}
-          className="text-decoration-none link-body-emphasis"
-        >
-          {task.title}
-        </Link>
+        <div className="form-check">
+          <input
+            type="checkbox"
+            name="selectTask"
+            id={`selectTask-${task.id}`}
+            className="form-check-input"
+            checked={checked}
+            onChange={() => onToggle(task.id)}
+          />
+          <Link
+            to={`/task/${task.id}`}
+            className="text-decoration-none link-body-emphasis"
+          >
+            {task.title}
+          </Link>
+        </div>
       </td>
       <td className={`${getStatusClass(task.status)} fw-semibold`}>
         {task.status}

@@ -77,6 +77,53 @@ export default function useTasks() {
     }
   }
 
+  // DELETE MULTIPLE TASKS
+
+  async function removeMultipleTasks(ids) {
+    try {
+      const requests = ids.map((id) => {
+        return fetch(`${import.meta.env.VITE_BACKEND_TASKLIST_URL}/${id}`, {
+          method: "DELETE",
+        });
+      });
+
+      const results = await Promise.allSettled(requests);
+
+      const successfulIds = results
+        .map((result, index) => {
+          if (result.status === "fulfilled" && result.value.ok) {
+            return ids[index];
+          }
+          return null;
+        })
+        .filter((id) => id !== null);
+
+      const failedIds = results
+        .map((result, index) => {
+          if (result.status === "rejected" || !result.value?.ok) {
+            return ids[index];
+          }
+          return null;
+        })
+        .filter((id) => id !== null);
+
+      if (successfulIds.length > 0) {
+        setTasks((prev) =>
+          prev.filter((task) => !successfulIds.includes(task.id)),
+        );
+      }
+
+      if (failedIds.length > 0) {
+        throw new Error(
+          `I seguenti id non sono stati eliminati: ${failedIds.join(", ")}`,
+        );
+      }
+    } catch (error) {
+      console.error(error.message);
+      throw error;
+    }
+  }
+
   //PUT
   async function updateTask(id, taskData) {
     try {
@@ -110,7 +157,5 @@ export default function useTasks() {
     }
   }
 
-  console.log(tasks);
-
-  return { tasks, addTask, removeTask, updateTask };
+  return { tasks, addTask, removeTask, updateTask, removeMultipleTasks };
 }

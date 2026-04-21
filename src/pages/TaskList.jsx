@@ -4,10 +4,21 @@ import { useCallback, useMemo, useState } from "react";
 import { debounce } from "../functions/debounce";
 
 export default function TaskList() {
-  const { tasks } = useGlobal();
+  const { tasks, removeMultipleTasks } = useGlobal();
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTaskIds, setSelectedTaskIds] = useState([]);
+
+  const toggleSelection = (taskId) => {
+    setSelectedTaskIds((prev) => {
+      if (prev.includes(taskId)) {
+        return prev.filter((id) => id !== taskId);
+      }
+
+      return [...prev, taskId];
+    });
+  };
 
   const handleSearch = useCallback(
     debounce((value) => {
@@ -19,6 +30,18 @@ export default function TaskList() {
   const handleChange = (e) => {
     handleSearch(e.target.value);
   };
+
+  async function handleMultipleRemove() {
+    try {
+      await removeMultipleTasks(selectedTaskIds);
+      alert(
+        `${selectedTaskIds.length === 1 ? "Task eliminata" : "Task eliminate"} correttamente`,
+      );
+      setSelectedTaskIds([]);
+    } catch (error) {
+      alert(error.message);
+    }
+  }
 
   const sortedTasks = useMemo(() => {
     const filteredTasks = tasks.filter((t) => {
@@ -164,7 +187,12 @@ export default function TaskList() {
                     <tbody>
                       {sortedTasks.length > 0 ? (
                         sortedTasks.map((task) => (
-                          <TaskRow key={task.id} task={task} />
+                          <TaskRow
+                            key={task.id}
+                            task={task}
+                            checked={selectedTaskIds.includes(task.id)}
+                            onToggle={toggleSelection}
+                          />
                         ))
                       ) : (
                         <tr>
@@ -178,6 +206,15 @@ export default function TaskList() {
                       )}
                     </tbody>
                   </table>
+                  {selectedTaskIds.length > 0 && (
+                    <button
+                      type="button"
+                      className="btn btn-danger mt-3"
+                      onClick={handleMultipleRemove}
+                    >
+                      Elimina Selezionate
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
