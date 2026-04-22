@@ -3,6 +3,7 @@ import { useGlobal } from "../context/GlobalContext";
 import Modal from "../components/Modal";
 import { useState } from "react";
 import EditTaskModal from "../components/EditTaskModal";
+import dayjs from "dayjs";
 
 export default function TaskDetails() {
   const { id } = useParams();
@@ -73,7 +74,7 @@ export default function TaskDetails() {
                   {task.status}
                 </span>
                 <span className="badge text-bg-light px-3 py-2">
-                  {new Date(task.createdAt).toLocaleDateString("it-IT")}
+                  {dayjs(task.createdAt).format("DD/MM/YYYY")}
                 </span>
               </div>
 

@@ -1,30 +1,45 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
+import tasksReducer, { initialTasksState } from "../functions/tasksReducer";
 
 export default function useTasks() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasksState);
 
   // GET
   async function getTasks() {
     try {
       const resp = await fetch(import.meta.env.VITE_BACKEND_TASKLIST_URL);
+
       if (!resp.ok) {
         throw new Error("Errore nella risposta del server");
       }
+
       const data = await resp.json();
       return data;
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
       return [];
     }
   }
 
   useEffect(() => {
-    getTasks().then((data) => setTasks(data));
+    getTasks().then((data) => {
+      dispatch({ type: "LOAD_TASKS", payload: data });
+    });
   }, []);
 
   // POST
   async function addTask(taskData) {
     try {
+      const normalizedTitle = taskData.title.trim().toLowerCase();
+
+      const alreadyExists = tasks.some(
+        (t) => t.title.trim().toLowerCase() === normalizedTitle,
+      );
+
+      if (alreadyExists) {
+        throw new Error("Task già esistente");
+      }
+
       const resp = await fetch(import.meta.env.VITE_BACKEND_TASKLIST_URL, {
         method: "POST",
         headers: {
@@ -43,7 +58,7 @@ export default function useTasks() {
         throw new Error(data.message);
       }
 
-      setTasks((prev) => [...prev, data.task]);
+      dispatch({ type: "ADD_TASK", payload: data.task });
     } catch (error) {
       console.error(error.message);
       throw error;
@@ -70,7 +85,7 @@ export default function useTasks() {
         throw new Error(data.message);
       }
 
-      setTasks((prev) => prev.filter((task) => task.id !== Number(id)));
+      dispatch({ type: "REMOVE_TASK", payload: Number(id) });
     } catch (error) {
       console.error(error.message);
       throw error;
@@ -78,7 +93,6 @@ export default function useTasks() {
   }
 
   // DELETE MULTIPLE TASKS
-
   async function removeMultipleTasks(ids) {
     try {
       const requests = ids.map((id) => {
@@ -108,9 +122,10 @@ export default function useTasks() {
         .filter((id) => id !== null);
 
       if (successfulIds.length > 0) {
-        setTasks((prev) =>
-          prev.filter((task) => !successfulIds.includes(task.id)),
-        );
+        dispatch({
+          type: "REMOVE_MULTIPLE_TASKS",
+          payload: successfulIds,
+        });
       }
 
       if (failedIds.length > 0) {
@@ -124,9 +139,21 @@ export default function useTasks() {
     }
   }
 
-  //PUT
+  // PUT
   async function updateTask(id, taskData) {
     try {
+      const normalizedTitle = taskData.title.trim().toLowerCase();
+
+      const alreadyExists = tasks.some(
+        (t) =>
+          t.id !== Number(id) &&
+          t.title.trim().toLowerCase() === normalizedTitle,
+      );
+
+      if (alreadyExists) {
+        throw new Error("Task già esistente");
+      }
+
       const resp = await fetch(
         `${import.meta.env.VITE_BACKEND_TASKLIST_URL}/${id}`,
         {
@@ -148,9 +175,7 @@ export default function useTasks() {
         throw new Error(data.message);
       }
 
-      setTasks((prev) =>
-        prev.map((task) => (task.id === Number(id) ? data.task : task)),
-      );
+      dispatch({ type: "UPDATE_TASK", payload: data.task });
     } catch (error) {
       console.error(error.message);
       throw error;
