@@ -10,7 +10,7 @@ export default function TaskList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
 
-  const toggleSelection = (taskId) => {
+  const toggleSelection = useCallback((taskId) => {
     setSelectedTaskIds((prev) => {
       if (prev.includes(taskId)) {
         return prev.filter((id) => id !== taskId);
@@ -18,7 +18,7 @@ export default function TaskList() {
 
       return [...prev, taskId];
     });
-  };
+  }, []);
 
   const handleSearch = useCallback(
     debounce((value) => {
